@@ -1193,7 +1193,6 @@ $("#sliderWidth").slider({
 
 $('#nextBlockBtn').click(function() {
     currentBlockIndex++;
-    // Cycle back to 0 if we go past the end (allows retrying)
     if (currentBlockIndex >= blockConfigs.length) {
         currentBlockIndex = 0;
     }
@@ -1201,72 +1200,44 @@ $('#nextBlockBtn').click(function() {
     fittsTest.isoParams.distance = config.distance;
     fittsTest.isoParams.width = config.width;
     $('#blockStatus').text(config.label);
-    fittsTest.updateISOCircles();
-    fittsTest.start(); // Reset active dataset
-});
-
-// Initialize the first block on load
-$(document).ready(function() {
-    // Force the start at Block 1
-    fittsTest.isoParams.distance = blockConfigs[0].distance;
-    fittsTest.isoParams.width = blockConfigs[0].width;
-    fittsTest.updateISOCircles();
-});
-
-// $('#downloadBtn').click(function() {
-//     var csvContent = "Block_Label,Distance_px,Width_px,ID_Index,MovementTime_ms\n";
     
-//     // Loop through all data sets stored in the tool
-//     for (var i = 0; i < fittsTest.data.length; i++) {
-//         var set = fittsTest.data[i];
-        
-//         // Set block label
-//         var blockLabel = "Unknown";
-//         if (set.distance == 200 && set.width == 50) blockLabel = "Block 1";
-//         if (set.distance == 300 && set.width == 30) blockLabel = "Block 2";
-//         if (set.distance == 400 && set.width == 15) blockLabel = "Block 3";
-
-//         // Loop through every click in set
-//         for (var j = 0; j < set.data.length; j++) {
-//             var click = set.data[j];
-//             var calculatedID = Math.log2((set.distance / set.width) + 1).toFixed(3);
-//             csvContent += blockLabel + "," + set.distance + "," + set.width + "," + calculatedID + "," + click.time + "\n";
-//         }
-//     }
-
-//     // Download data in csv format
-//     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-//     var link = document.createElement("a");
-//     var url = URL.createObjectURL(blob);
-//     link.setAttribute("href", url);
-//     link.setAttribute("download", "fitts_experiment_results.csv");
-//     link.style.visibility = 'hidden';
-//     document.body.appendChild(link);
-//     link.click();
-//     document.body.removeChild(link);
-// });
+    // Updates the circles and resets the counter
+    fittsTest.updateISOCircles(); 
+});
 
 $('#submitBtn').click(function() {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxrO5sUDusvu94Y_BD1jUYHlomVbU6tYBeQcZIY7DiR45Pys8vCp5EfUSOWBABhdmtxhg/exec'; // Script URL
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxrO5sUDusvu94Y_BD1jUYHlomVbU6tYBeQcZIY7DiR45Pys8vCp5EfUSOWBABhdmtxhg/exec'; 
     const studentName = $('#studentName').val();
     const deviceGroup = $('#deviceGroup').val();
 
     if (!studentName) { alert("Enter your name or matricule"); return; }
-	if (!deviceGroup) { alert("Select a device group"); return; }
-	if (!fittsTest.data) { alert("Run expirement before submitting"); return; }
+    if (!deviceGroup) { alert("Select a device group"); return; }
+    // Check if data array is effectively empty (accounting for index 0 gap)
+    if (!fittsTest.data || fittsTest.data.length <= 1) { alert("Run experiment before submitting"); return; }
 
     let payload = [];
+    
+    // Iterate over datasets
     fittsTest.data.forEach(set => {
-        let blockLabel = set.distance == 200 ? "Low" : (set.distance == 300 ? "Med" : "High");
-        let id = Math.log2((set.distance / set.width) + 1).toFixed(3);
-        
+        // Iterate over individual clicks
         set.data.forEach(click => {
+            let d = click.distance;
+            let w = click.width;
+            
+            // Determine Block Label based on the click params
+            let blockLabel = "Custom";
+            if (d == 200 && w == 50) blockLabel = "Block 1";
+            else if (d == 300 && w == 30) blockLabel = "Block 2";
+            else if (d == 400 && w == 15) blockLabel = "Block 3";
+
+            let id = Math.log2((d / w) + 1).toFixed(3);
+
             payload.push({
                 studentName: studentName,
                 deviceGroup: deviceGroup,
                 blockLabel: blockLabel,
-                distance: set.distance,
-                width: set.width,
+                distance: d,
+                width: w,
                 id: id,
                 time: click.time
             });
@@ -1276,7 +1247,7 @@ $('#submitBtn').click(function() {
     // Send to Google Sheets
     fetch(scriptUrl, {
         method: 'POST',
-        mode: 'no-cors', // Google Apps-Script
+        mode: 'no-cors',
         cache: 'no-cache',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
