@@ -1191,6 +1191,28 @@ $("#sliderWidth").slider({
 	}
 });
 
+$('#nextBlockBtn').click(function() {
+    currentBlockIndex++;
+    // Cycle back to 0 if we go past the end (allows retrying)
+    if (currentBlockIndex >= blockConfigs.length) {
+        currentBlockIndex = 0;
+    }
+    var config = blockConfigs[currentBlockIndex];
+    fittsTest.isoParams.distance = config.distance;
+    fittsTest.isoParams.width = config.width;
+    $('#blockStatus').text(config.label);
+    fittsTest.updateISOCircles();
+    fittsTest.start(); // Reset active dataset
+});
+
+// Initialize the first block on load
+$(document).ready(function() {
+    // Force the start at Block 1
+    fittsTest.isoParams.distance = blockConfigs[0].distance;
+    fittsTest.isoParams.width = blockConfigs[0].width;
+    fittsTest.updateISOCircles();
+});
+
 $('#randomizeButton').click(function() {
 	fittsTest.randomizeParams();
 	$('#randomizeCheckbox').attr('checked', true);
