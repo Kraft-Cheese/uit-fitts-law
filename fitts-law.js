@@ -10,6 +10,15 @@
  * @param {number} bottom Margin form the bottom edge.
  * @param {number} left Margin form the left edge.
  */
+
+// Temporary new globals for set blocks
+var currentBlockIndex = 0;
+var blockConfigs = [
+    { distance: 200, width: 50, label: "Block 1" },
+    { distance: 300, width: 30, label: "Block 2" },
+    { distance: 400, width: 15, label: "Block 3" }
+];
+
 function makeDimension(width, height, top, right, bottom, left) {
 	return {width: width,
 		height: height,
