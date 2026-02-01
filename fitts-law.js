@@ -1213,6 +1213,39 @@ $(document).ready(function() {
     fittsTest.updateISOCircles();
 });
 
+$('#downloadBtn').click(function() {
+    var csvContent = "Block_Label,Distance_px,Width_px,ID_Index,MovementTime_ms\n";
+    
+    // Loop through all data sets stored in the tool
+    for (var i = 0; i < fittsTest.data.length; i++) {
+        var set = fittsTest.data[i];
+        
+        // Set block label
+        var blockLabel = "Unknown";
+        if (set.distance == 200 && set.width == 50) blockLabel = "Block 1";
+        if (set.distance == 300 && set.width == 30) blockLabel = "Block 2";
+        if (set.distance == 400 && set.width == 15) blockLabel = "Block 3";
+
+        // Loop through every click in set
+        for (var j = 0; j < set.data.length; j++) {
+            var click = set.data[j];
+            var calculatedID = Math.log2((set.distance / set.width) + 1).toFixed(3);
+            csvContent += blockLabel + "," + set.distance + "," + set.width + "," + calculatedID + "," + click.time + "\n";
+        }
+    }
+
+    // Download data in csv format
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    var link = document.createElement("a");
+    var url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "fitts_experiment_results.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+
 $('#randomizeButton').click(function() {
 	fittsTest.randomizeParams();
 	$('#randomizeCheckbox').attr('checked', true);
