@@ -1270,8 +1270,8 @@ $('#submitBtn').click(function() {
 
 $('#randomizeButton').click(function() {
 	fittsTest.randomizeParams();
-	$('#randomizeCheckbox').attr('checked', true);
-	fittsTest.isoParams.randomize = true;
+	$('#randomizeCheckbox').attr('checked', false);
+	fittsTest.isoParams.randomize = false;
 });
 
 $('#randomizeCheckbox').change(function(event) {
