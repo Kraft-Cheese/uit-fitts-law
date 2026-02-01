@@ -1198,12 +1198,16 @@ $('#nextBlockBtn').click(function() {
         currentBlockIndex = 0;
     }
     var config = blockConfigs[currentBlockIndex];
+    
+    // Set the parameters
     fittsTest.isoParams.distance = config.distance;
     fittsTest.isoParams.width = config.width;
-    $('#blockStatus').text(config.label);
     
-    // Updates the circles and resets the counter
-    fittsTest.updateISOCircles(); 
+    fittsTest.isoParams.randomize = false; 
+    $('#randomizeCheckbox').prop('checked', false);
+    
+    $('#blockStatus').text(config.label);
+    fittsTest.updateISOCircles();
 });
 
 $('#submitBtn').click(function() {
@@ -1231,11 +1235,9 @@ $('#submitBtn').click(function() {
             let d = click.distance;
             let w = click.width;
             
-            // Determine Block Label based on the click params
-            let blockLabel = "Custom";
-            if (d == 200 && w == 50) blockLabel = "Block 1";
-            else if (d == 300 && w == 30) blockLabel = "Block 2";
-            else if (d == 400 && w == 15) blockLabel = "Block 3";
+            // Determine Block Label based on the config
+			let blockMatch = blockConfigs.find(c => c.distance == d && c.width == w);
+			let blockLabel = blockMatch ? blockMatch.label : "Custom";
 
             let id = Math.log2((d / w) + 1).toFixed(3);
 
