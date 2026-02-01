@@ -14,9 +14,9 @@
 // Temporary new globals for set blocks
 var currentBlockIndex = 0;
 var blockConfigs = [
-    { distance: 200, width: 50, label: "Block 1" },
-    { distance: 300, width: 30, label: "Block 2" },
-    { distance: 400, width: 15, label: "Block 3" }
+    { distance: 100, width: 50, label: "Block 1" },
+    { distance: 200, width: 30, label: "Block 2" },
+    { distance: 300, width: 15, label: "Block 3" }
 ];
 
 function makeDimension(width, height, top, right, bottom, left) {
