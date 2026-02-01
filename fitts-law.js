@@ -1207,7 +1207,7 @@ $('#nextBlockBtn').click(function() {
 });
 
 $('#submitBtn').click(function() {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbyxfNL1Ev2Dk22UkAgbh2WUgdmQD7IoGlzD3lqvQTMnmgwF8qlDhb2yHZv8e_U2WIGdqQ/exec'; 
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxZQyNv2WuTtmQYO62SUPxK3ZQrX7t_FDlFB8oxhhIjFdcRzOV8DnUu1hGjrd3a0oZuUw/exec'; 
     const studentName = $('#studentName').val();
     const deviceGroup = $('#deviceGroup').val();
 
@@ -1215,6 +1215,12 @@ $('#submitBtn').click(function() {
     if (!deviceGroup) { alert("Select a device group"); return; }
     // Check if data array is effectively empty (accounting for index 0 gap)
     if (!fittsTest.data || fittsTest.data.length <= 1) { alert("Run experiment before submitting"); return; }
+
+	const screenWidth = screen.width;
+    const screenHeight = screen.height;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const pixelRatio = window.devicePixelRatio || 1;
 
     let payload = [];
     
@@ -1240,7 +1246,12 @@ $('#submitBtn').click(function() {
                 distance: d,
                 width: w,
                 id: id,
-                time: click.time
+                time: click.time,
+				screenWidth: screenWidth,
+                screenHeight: screenHeight,
+                windowWidth: windowWidth,
+                windowHeight: windowHeight,
+                pixelRatio: pixelRatio
             });
         });
     });
