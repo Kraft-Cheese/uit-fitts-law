@@ -1213,37 +1213,76 @@ $(document).ready(function() {
     fittsTest.updateISOCircles();
 });
 
-$('#downloadBtn').click(function() {
-    var csvContent = "Block_Label,Distance_px,Width_px,ID_Index,MovementTime_ms\n";
+// $('#downloadBtn').click(function() {
+//     var csvContent = "Block_Label,Distance_px,Width_px,ID_Index,MovementTime_ms\n";
     
-    // Loop through all data sets stored in the tool
-    for (var i = 0; i < fittsTest.data.length; i++) {
-        var set = fittsTest.data[i];
+//     // Loop through all data sets stored in the tool
+//     for (var i = 0; i < fittsTest.data.length; i++) {
+//         var set = fittsTest.data[i];
         
-        // Set block label
-        var blockLabel = "Unknown";
-        if (set.distance == 200 && set.width == 50) blockLabel = "Block 1";
-        if (set.distance == 300 && set.width == 30) blockLabel = "Block 2";
-        if (set.distance == 400 && set.width == 15) blockLabel = "Block 3";
+//         // Set block label
+//         var blockLabel = "Unknown";
+//         if (set.distance == 200 && set.width == 50) blockLabel = "Block 1";
+//         if (set.distance == 300 && set.width == 30) blockLabel = "Block 2";
+//         if (set.distance == 400 && set.width == 15) blockLabel = "Block 3";
 
-        // Loop through every click in set
-        for (var j = 0; j < set.data.length; j++) {
-            var click = set.data[j];
-            var calculatedID = Math.log2((set.distance / set.width) + 1).toFixed(3);
-            csvContent += blockLabel + "," + set.distance + "," + set.width + "," + calculatedID + "," + click.time + "\n";
-        }
-    }
+//         // Loop through every click in set
+//         for (var j = 0; j < set.data.length; j++) {
+//             var click = set.data[j];
+//             var calculatedID = Math.log2((set.distance / set.width) + 1).toFixed(3);
+//             csvContent += blockLabel + "," + set.distance + "," + set.width + "," + calculatedID + "," + click.time + "\n";
+//         }
+//     }
 
-    // Download data in csv format
-    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    var link = document.createElement("a");
-    var url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "fitts_experiment_results.csv");
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+//     // Download data in csv format
+//     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+//     var link = document.createElement("a");
+//     var url = URL.createObjectURL(blob);
+//     link.setAttribute("href", url);
+//     link.setAttribute("download", "fitts_experiment_results.csv");
+//     link.style.visibility = 'hidden';
+//     document.body.appendChild(link);
+//     link.click();
+//     document.body.removeChild(link);
+// });
+
+$('#submitBtn').click(function() {
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxrO5sUDusvu94Y_BD1jUYHlomVbU6tYBeQcZIY7DiR45Pys8vCp5EfUSOWBABhdmtxhg/exec'; // Script URL
+    const studentName = $('#studentName').val();
+    const deviceGroup = $('#deviceGroup').val();
+
+    if (!studentName) { alert("Enter your name or matricule"); return; }
+	if (!deviceGroup) { alert("Select a device group"); return; }
+	if (!fittsTest.data) { alert("Run expirement before submitting"); return; }
+
+    let payload = [];
+    fittsTest.data.forEach(set => {
+        let blockLabel = set.distance == 200 ? "Low" : (set.distance == 300 ? "Med" : "High");
+        let id = Math.log2((set.distance / set.width) + 1).toFixed(3);
+        
+        set.data.forEach(click => {
+            payload.push({
+                studentName: studentName,
+                deviceGroup: deviceGroup,
+                blockLabel: blockLabel,
+                distance: set.distance,
+                width: set.width,
+                id: id,
+                time: click.time
+            });
+        });
+    });
+
+    // Send to Google Sheets
+    fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors', // Google Apps-Script
+        cache: 'no-cache',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).then(() => {
+        alert("Data sent to sheet");
+    }).catch(err => alert("Error: " + err));
 });
 
 $('#randomizeButton').click(function() {
