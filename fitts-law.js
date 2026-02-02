@@ -1211,14 +1211,19 @@ $('#nextBlockBtn').click(function() {
 });
 
 $('#submitBtn').click(function() {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwQaC8sFmgQn4rzW_nk5EHlsfiyEHNO1CWcFSA8hXMcgokgEw6Q4HQ59ngwvS2rZjq7yA/exec'; 
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycby4nKG5r2vSfM1xXuP5re8O-fb7y5wbKuwyxFq1THOOz2vnyK05QYtVkebv2qD36SJY9A/exec'; 
     const studentName = $('#studentName').val();
     const deviceGroup = $('#deviceGroup').val();
 
     if (!studentName) { alert("Enter your name or matricule"); return; }
     if (!deviceGroup) { alert("Select a device group"); return; }
     // Check if data array is effectively empty (accounting for index 0 gap)
-    if (!fittsTest.data || fittsTest.data.length <= 1) { alert("Run experiment before submitting"); return; }
+    var totalPoints = 0;
+	fittsTest.data.forEach(function(s) { if (s && s.data) totalPoints += s.data.length; });
+	if (totalPoints < 9) { 
+		alert("Complete at least 1 block (9 targets).\nYou have: " + totalPoints); 
+		return; 
+	}
 
 	const screenWidth = screen.width;
     const screenHeight = screen.height;
@@ -1230,6 +1235,7 @@ $('#submitBtn').click(function() {
     
     // Iterate over datasets
     fittsTest.data.forEach(set => {
+		if (!set || !set.data) return;
         // Iterate over individual clicks
         set.data.forEach(click => {
             let d = click.distance;
