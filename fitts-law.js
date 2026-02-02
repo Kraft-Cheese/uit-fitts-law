@@ -1211,7 +1211,7 @@ $('#nextBlockBtn').click(function() {
 });
 
 $('#submitBtn').click(function() {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxZQyNv2WuTtmQYO62SUPxK3ZQrX7t_FDlFB8oxhhIjFdcRzOV8DnUu1hGjrd3a0oZuUw/exec'; 
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwQaC8sFmgQn4rzW_nk5EHlsfiyEHNO1CWcFSA8hXMcgokgEw6Q4HQ59ngwvS2rZjq7yA/exec'; 
     const studentName = $('#studentName').val();
     const deviceGroup = $('#deviceGroup').val();
 
